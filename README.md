@@ -1,3 +1,10 @@
+1)
+Link to the Retina dataset: https://www.kaggle.com/c/diabetic-retinopathy-detection
+And preprocess the images according to preprocessImages.py
+
+
+
+
 %.................................................................................................................
 Docker usage:
 - sudo docker pull vickyqu0/cwt:latest
