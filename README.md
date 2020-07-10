@@ -1,22 +1,23 @@
-**Retina**
- Link to the Retina dataset: [link](https://www.kaggle.com/c/diabetic-retinopathy-detection)
+Link to the handout : [[link]](https://github.com/jbdel/federated_learning/blob/master/Stanford_federated_handout.pdf) <br/><br/>
 
+## Datasets
+**Retina**<br/><br/>
+ Link to the Retina dataset: [[link]](https://www.kaggle.com/c/diabetic-retinopathy-detection)<br/>
 And preprocess the images according to preprocessImages.py
 
-**ODIR5k**
-ODIR5k train set : [link](https://drive.google.com/file/d/1UGrMGfb9zvbBqOvbV62G-XdUlBIAvOad/view) and annotations [link](https://drive.google.com/file/d/1jc7Dmp26km0PKRwf9u3Xcyui4SRiojcT/view)
+**ODIR5k**<br/><br/>
+ODIR5k train set : [[link]](https://drive.google.com/file/d/1UGrMGfb9zvbBqOvbV62G-XdUlBIAvOad/view) and annotations [[link]](https://drive.google.com/file/d/1jc7Dmp26km0PKRwf9u3Xcyui4SRiojcT/view) <br/><br/>
 
-offsite testing image - [link](https://drive.google.com/file/d/19OD9a29nrSbLC2Pch4UZtpp8qtFZLd-y/view
+offsite testing image - [[link]](https://drive.google.com/file/d/19OD9a29nrSbLC2Pch4UZtpp8qtFZLd-y/view
 
-**REFUGE**
-	
-Images and Glaucoma labels train [link](https://www.dropbox.com/s/xd40dewhj0v5gw1/REFUGE-Training400.zip?dl=0) <br/>
-validation https://www.dropbox.com/s/hhq1srz9ceot8sf/REFUGE-Validation400.zip?dl=0<br/>
-test  https://www.dropbox.com/s/t1ijw6mdqhd79dm/REFUGE-Test400.zip?dl=0 <br/><br/>
+**REFUGE**<br/><br/>	
+Images and Glaucoma labels train [[link]](https://www.dropbox.com/s/xd40dewhj0v5gw1/REFUGE-Training400.zip?dl=0) <br/>
+validation [[link]](https://www.dropbox.com/s/hhq1srz9ceot8sf/REFUGE-Validation400.zip?dl=0) <br/>
+test [[link]](https://www.dropbox.com/s/t1ijw6mdqhd79dm/REFUGE-Test400.zip?dl=0) <br/><br/>
 
-Annotation train : https://www.dropbox.com/s/030vecfp36ikiml/Annotation-Training400.zip?dl=0 <br/>
-validation : https://www.dropbox.com/s/sdgfefzomm5auog/REFUGE-Validation400-GT.zip?dl=0 <br/>
-test https://www.dropbox.com/s/2w0aof1tqp9gi5a/REFUGE-Test-GT.zip?dl=0  <br/>
+Annotation train : [[link]](https://www.dropbox.com/s/030vecfp36ikiml/Annotation-Training400.zip?dl=0) <br/>
+validation : [[link]](https://www.dropbox.com/s/sdgfefzomm5auog/REFUGE-Validation400-GT.zip?dl=0) <br/>
+test [[link]](https://www.dropbox.com/s/2w0aof1tqp9gi5a/REFUGE-Test-GT.zip?dl=0)  <br/>
 
 
 Training a model
