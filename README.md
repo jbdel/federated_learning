@@ -20,7 +20,7 @@ validation : [[link]](https://www.dropbox.com/s/sdgfefzomm5auog/REFUGE-Validatio
 test [[link]](https://www.dropbox.com/s/2w0aof1tqp9gi5a/REFUGE-Test-GT.zip?dl=0)  <br/>
 
 
-Training a model
+## Training a model
 ```
 - Run `python main.py --central_path ADNI_experiment --data_path Data  --num_inst 2 --inst_id 1 --phase train`
 ```
