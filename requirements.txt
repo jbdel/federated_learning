@@ -1,5 +1,0 @@
-numpy
-paramiko
-tensorboard
-torchvision
-pydicom
