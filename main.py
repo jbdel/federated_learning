@@ -1,73 +1,81 @@
-
-import paramiko
+import numpy as np
 import argparse
-from utils.start_config import initization_configure
-from utils.CWT_models import DistrSystem
+import torch
+import random
+from torch.utils.data import DataLoader
+from retina_dataset import Retina_Dataset
+from torchvision.models import resnet18
+import torch
+import torch.nn as nn
+import torch.optim as optim
 
-parser = argparse.ArgumentParser()
-## PART ONE PARAMETERS:  CENTRAL PARAMETER SERVER INFO
-parser = argparse.ArgumentParser(description='PyTorch CWT')
-parser.add_argument('--central_server', type=str, default='epad-public.stanford.edu', help='central parameter server')
-parser.add_argument('--username', type=str, default='distributed', help='central parameter server username')
-parser.add_argument('--password', type=str, default='Ch@ngeMe', help='central parameter server username')
-parser.add_argument('--central_path', type=str, default='ADNI_experiment', help='path to central parameter directory (/path/to/param_dir/')
+def parse_args():
+    parser = argparse.ArgumentParser()
+    # Model
+    parser.add_argument('--model', type=str, default="resnet18")
+    parser.add_argument('--dataloader', type=str, default="Retina_Dataset")
+    parser.add_argument('--seed', type=int, default=random.randint(0, 9999999))
+    parser.add_argument('--batch_size', type=int, default=32)
+    parser.add_argument('--data_dir', type=str, default="data")
+    parser.add_argument('--lr', type=float, default=0.0001)
 
-## PART TWO PARAMETERS:
-# LOCAL CONFIG
-parser.add_argument('--num_inst', type=int, default=2, help='number of participating training institutions')
-parser.add_argument('--inst_id', type=int, default= 1, help='order of your institution among the num_inst institutions: int in the range [1,num_inst]\
-	Must be different for each training institution')
-parser.add_argument('--data_path', type=str,default='Data', )
-parser.add_argument('--gpu_ids', type=str,default=0, help = 'used gpu ids' )
-
-## PART THREE: TRAIN PARAMETERS THE SAME FOR ALL THE INSTS
-parser.add_argument('--dis_model_name', type=str, default='CWT_ADNI_ResNet18', help='model name')
-parser.add_argument('--batch_size', type=int, default=16, help='Training batch size')
-parser.add_argument('--max_cycles', type=int,default=100, help = 'maximum epochs for train' )
-parser.add_argument('--SEED', type=int, default=666, help='Random seed, should be the same for all insts. ')
-parser.add_argument('--lr', type=float, default=0.0001,  help='Learning Rate. Default=0.0001')
-parser.add_argument('--load_size', type=int, default=256, help='Scale images to this size')
-parser.add_argument('--fine_size', type=int, default=224, help='Then crop to this size')
-parser.add_argument('--val_freq', type=int, default=1, help='frequncy for CWT transfer')
-parser.add_argument('--num_classes', type=int, default=2, help='num of classes')
-parser.add_argument('--num_workers', type=int, default=4, help='threads for loading data')
-parser.add_argument('--phase', type=str, default='train', help='train or test phase')
-parser.add_argument('--val', action='store_true', default=True, help='include to validate during training')
-parser.add_argument('--continue_train', action='store_true', default=False, help='Continue train from central saved model')
-parser.add_argument('--model_architecture', type=str, default='ResNet18', help='Type of model to use: one of ResNet34, DesNet121, inception_v3, squeezenet1_0')
-parser.add_argument('--regression', action='store_true', default = False,  help='Indicating using regression model or not')
-parser.add_argument('--sleep_time', type=int, default=60, help='time in seconds to pause between github pull requests')
-
-# FOLLOWING ARGUMENTS MUST BE THE SAME FOR ALL PARTICIPATING INSTITUTIONS DURING TRAINING
-
-# SELECT TRUE FOR ONE OF THE FOLLOWING TO ADDRESS LABEL IMBALANCE
-
+    args = parser.parse_args()
+    return args
 
 if __name__ == '__main__':
-    opt = parser.parse_args()
-    # step 1 : connecting to central server
+    # Base on args given, compute new args
+    args = parse_args()
 
-    ## step 1: ssh connection with central server
+    # Seed
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
-    ssh_client = paramiko.SSHClient()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    while True:
-        try:
-            ssh_client.connect(hostname=opt.central_server, username=opt.username,
-                               password=opt.password)
-            break
-        except:
-            print('Wrong password for', opt.username, opt.central_server)
+    # DataLoader
+    train_dset = eval(args.dataloader)('train', args)
+    eval_dset = eval(args.dataloader)('test', args)
+    train_loader = DataLoader(train_dset, args.batch_size, shuffle=True, num_workers=8, pin_memory=True)
+    eval_loader = DataLoader(eval_dset, args.batch_size, num_workers=8, pin_memory=True)
 
-    ## step 2: initization dataset and device setting
-    initization_configure(opt, ssh_client)
+    net = eval(args.model)(pretrained=True)
+    net.fc = nn.Linear(512, 5)
+    net.cuda()
 
-    ## step 3: start train or test
-    classifier = DistrSystem(opt, ssh_client)
-    if opt.phase == 'train':
-        classifier.train(opt.train_set_loader)
-    else:
-        classifier.train(opt.test_set_loader)
+    optimizer = optim.Adam(net.parameters(), lr=args.lr)
+    criterion = nn.CrossEntropyLoss(reduction="sum").cuda()
 
+    loss_tmp = 0
+    for iteration, data in enumerate(train_loader):
+        inputs = data['image'].cuda()
+        labels = data['label'].cuda()
+        optimizer.zero_grad()
+
+        outputs = net(inputs)
+
+        loss = criterion(outputs, labels.flatten())
+        loss.backward()
+        optimizer.step()
+        loss_tmp += loss.cpu().data.numpy()
+
+        print("\r[Epoch %2d][Step %4d/%4d] Loss: %.4f, Lr: %.2e" % (
+                  1,
+                  iteration,
+                  int(len(train_loader.dataset) / args.batch_size),
+                  loss_tmp / args.batch_size,
+                  args.lr,# *[group['lr'] for group in optim.param_groups],
+              ), end='          ')
+
+    net.train(False)
+    accuracy = []
+
+    for iteration, data in enumerate(eval_loader):
+        inputs = data['image'].cuda()
+        labels = data['label']
+        pred = net(inputs).cpu().data.numpy()
+        labels = labels.cpu().data.numpy()
+        accuracy += list(np.argmax(pred, axis=1) == labels.flatten())
+    print(100 * np.mean(np.array(accuracy)))
+    net.train(True)
 
 
