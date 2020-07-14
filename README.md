@@ -2,11 +2,14 @@
 ## Datasets
 **Retina**<br/><br/>
 
-[[Link to the Retina dataset]](https://www.kaggle.com/c/diabetic-retinopathy-detection)<br/>
+[[Retina dataset]](https://www.kaggle.com/c/diabetic-retinopathy-detection)<br/>
 Preprocess the images according to preprocessImages.py
 
 <b>Preprocess (unint8, 196736 bytes per image)</b><br/>
 ![preprocess](https://i.imgur.com/2ymMhnA.jpg)
+
+[[Link to preprocessed data]](https://www.dropbox.com/s/7rraox4puo6vcnx/data.zip?dl=1)
+
 ```
 Label balance for train Counter({0: 25810, 2: 5292, 1: 2443, 3: 873, 4: 708})
 Label balance for test Counter({0: 39533, 2: 7861, 1: 3762, 3: 1214, 4: 1206})
