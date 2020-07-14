@@ -1,9 +1,20 @@
-Link to the handout : [[link]](https://github.com/jbdel/federated_learning/blob/master/Stanford_federated_handout.pdf) <br/><br/>
-
+[[Link to the handout]](https://github.com/jbdel/federated_learning/blob/master/Stanford_federated_handout.pdf) <br/><br/>
 ## Datasets
 **Retina**<br/><br/>
- Link to the Retina dataset: [[link]](https://www.kaggle.com/c/diabetic-retinopathy-detection)<br/>
-And preprocess the images according to preprocessImages.py
+
+[[Link to the Retina dataset]](https://www.kaggle.com/c/diabetic-retinopathy-detection)<br/>
+Preprocess the images according to preprocessImages.py
+
+<b>Preprocess (unint8, 196736 bytes per image)</b><br/>
+![preprocess](https://i.imgur.com/2ymMhnA.jpg)
+```
+Label balance for train Counter({0: 25810, 2: 5292, 1: 2443, 3: 873, 4: 708})
+Label balance for test Counter({0: 39533, 2: 7861, 1: 3762, 3: 1214, 4: 1206})
+
+11G	data/test
+6,6G	data/train
+```
+[[So far, dataloader loads 100 files]](https://github.com/jbdel/federated_learning/blob/master/retina_dataset.py#L41) <br/>
 
 **ODIR5k**<br/><br/>
 ODIR5k train set : [[link]](https://drive.google.com/file/d/1UGrMGfb9zvbBqOvbV62G-XdUlBIAvOad/view) and annotations [[link]](https://drive.google.com/file/d/1jc7Dmp26km0PKRwf9u3Xcyui4SRiojcT/view) <br/><br/>
@@ -20,27 +31,3 @@ validation : [[link]](https://www.dropbox.com/s/sdgfefzomm5auog/REFUGE-Validatio
 test [[link]](https://www.dropbox.com/s/2w0aof1tqp9gi5a/REFUGE-Test-GT.zip?dl=0)  <br/>
 
 
-## Training a model
-```
-- Run `python main.py --central_path ADNI_experiment --data_path Data  --num_inst 2 --inst_id 1 --phase train`
-```
-
-```
-- Note: data_path 
-
-Dataset:
-- Required data organization (no other folders/files than the ones listed below):
-	data_dir/
-		labels.csv with following format in each line:
-			filename.dcm,label(int from 0 to num_classes-1 or float for regression)
-		train/
-			filename.dcm files for train
-		val/
-			filename.dcm files for val
-		test/
-			filename.dcm files for test
-- I put sample dataset in the sub-folder ./Data/.
-
-Output:
-All the output models/results will be saved on the created sub-folder, sub-folder is same as --central_path paramters.
-```
