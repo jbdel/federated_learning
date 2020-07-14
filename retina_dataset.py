@@ -42,7 +42,7 @@ class Retina_Dataset(Dataset):
         self.images = {}
         for file in files:
             filename = os.path.basename(os.path.splitext(file)[0])
-            self.images[filename] = Image.fromarray(np.load(file).astype(np.uint8))
+            self.images[filename] = Image.fromarray(np.load(file))
 
         # Loading labels
         reader = csv.DictReader(open(os.path.join(args.data_dir, name+"Labels.csv")), delimiter=',')
@@ -51,7 +51,6 @@ class Retina_Dataset(Dataset):
                 self.labels[row['image']] = int(row['level'])
 
         print("Label balance for " + name, Counter(self.labels.values()))
-
         self.set = list(self.images.keys())
 
     def __getitem__(self, idx):

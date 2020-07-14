@@ -23,7 +23,6 @@ def parse_args():
     return args
 
 if __name__ == '__main__':
-    # Base on args given, compute new args
     args = parse_args()
 
     # Seed
