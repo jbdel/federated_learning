@@ -2,7 +2,7 @@
 .
 ├── data
 │   ├── images
-│   ├── testLabels.csv
+│   ├── valLabels.csv
 │   ├── trainLabels.csv
 │   ├── train_liang.csv
 │   └── val_liang.csv
