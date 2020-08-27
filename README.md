@@ -14,6 +14,8 @@
 ```
 
 Place all .npy files from retina dataset (links below) in the data/images folder.
+
+Homogeneous distribution for each site, each round:
 ```
 python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1500 --epoch_per 5 --distribution [[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5]]
 ```
@@ -38,7 +40,13 @@ python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1500 --epoch_
 [Round  5][Site  4][Epoch  5][Step   93/  93] Loss: 0.0133, Lr: 1.00e-04          Evaluation accuracy 77.03333333333333
 ```
 
-
+To launch unbalanced, explicitly specifiy rounds
+```
+python main.py --batch_size 16 --rounds 2 --sites 4 --samples_site 750 --epoch_per 5 --distribution ['\
+                                                                                                    '[[0.2,0.8],[0.2,0.8],[0.2,0.8],[0.2,0.8]],'\
+                                                                                                    '[[0.8,0.2],[0.8,0.2],[0.8,0.2],[0.8,0.2]]'\
+                                                                                                    ']
+```
 
 
 [[Link to the handout]](https://github.com/jbdel/federated_learning/blob/master/Stanford_federated_handout.pdf) <br/><br/>
