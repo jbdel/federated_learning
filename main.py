@@ -31,14 +31,13 @@ def parse_args():
     parser.add_argument('--rounds', type=int, default=5)
     parser.add_argument('--sites', type=int, default=4)
     parser.add_argument('--samples_site', type=int, default=1000)
-    parser.add_argument('--distribution', type=list, default=[0.5, 0.5])
+    parser.add_argument('--distribution', nargs='+', type=float, default=[0.5, 0.5])
 
     args = parser.parse_args()
     return args
 
 if __name__ == '__main__':
     args = parse_args()
-
     assert args.samples_site * args.sites <= NUM_OF_TRAIN_EXAMPLES, "Not enough training samples"
     assert sum(args.distribution) == 1, "Distribution needs to sum to 1"
     assert args.task_binary == (len(args.distribution) == 2), "If task is binary, needs only two distribution"
