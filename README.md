@@ -38,7 +38,6 @@ python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1500 --epoch_
 [Round  5][Site  4][Epoch  5][Step   93/  93] Loss: 0.0133, Lr: 1.00e-04          Evaluation accuracy 77.03333333333333
 ```
 
-python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1500 --epoch_per 5 --distribution [[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5]]
 
 
 
