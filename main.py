@@ -9,21 +9,39 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+NUM_OF_TRAIN_EXAMPLES = 35126
+
 def parse_args():
     parser = argparse.ArgumentParser()
+    # Data
+    parser.add_argument('--dataloader', type=str, default="Retina_Dataset")
+    parser.add_argument('--data_dir', type=str, default="data")
+
     # Model
     parser.add_argument('--model', type=str, default="resnet18")
-    parser.add_argument('--dataloader', type=str, default="Retina_Dataset")
     parser.add_argument('--seed', type=int, default=random.randint(0, 9999999))
-    parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--data_dir', type=str, default="data")
+
+    # Training
+    parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--lr', type=float, default=0.0001)
+    parser.add_argument('--task_binary', type=bool, default=True)
+
+    # Federated
+    parser.add_argument('--rounds', type=int, default=5)
+    parser.add_argument('--sites', type=int, default=4)
+    parser.add_argument('--samples_site', type=int, default=1000)
+    parser.add_argument('--distribution', type=list, default=[0.5, 0.5])
 
     args = parser.parse_args()
     return args
 
 if __name__ == '__main__':
     args = parse_args()
+
+    assert args.samples_site * args.sites <= NUM_OF_TRAIN_EXAMPLES, "Not enough training samples"
+    assert sum(args.distribution) == 1, "Distribution needs to sum to 1"
+    assert args.task_binary == (len(args.distribution) == 2), "If task is binary, needs only two distribution"
+    assert (not args.task_binary) == (len(args.distribution) == 5), "If task is not binary, needs five distribution"
 
     # Seed
     torch.manual_seed(args.seed)
@@ -32,49 +50,52 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
 
     # DataLoader
-    train_dset = eval(args.dataloader)('train', args)
-    eval_dset = eval(args.dataloader)('test', args)
-    train_loader = DataLoader(train_dset, args.batch_size, shuffle=True, num_workers=8, pin_memory=True)
-    eval_loader = DataLoader(eval_dset, args.batch_size, num_workers=8, pin_memory=True)
+    site_loaders = []
+    for i in range(args.sites):
+        train_dset = eval(args.dataloader)('train', args, num_site=i)
+        site_loaders.append(DataLoader(train_dset, args.batch_size, shuffle=True, num_workers=4))
+
+    eval_dset = eval(args.dataloader)('val', args, num_site='val')
+    eval_loader = DataLoader(eval_dset, args.batch_size, num_workers=4)
 
     net = eval(args.model)(pretrained=True)
-    net.fc = nn.Linear(512, 5)
+    net.fc = nn.Linear(512,
+                       2 if args.task_binary else 5)
     net.cuda()
 
     optimizer = optim.Adam(net.parameters(), lr=args.lr)
     criterion = nn.CrossEntropyLoss(reduction="sum").cuda()
+    for round in range(args.rounds):
+        net.train(True)
+        for i, site_loader in enumerate(site_loaders):
+            for iteration, data in enumerate(site_loader):
+                inputs = data['image'].cuda()
+                labels = data['label'].cuda()
+                optimizer.zero_grad()
 
-    loss_tmp = 0
-    for iteration, data in enumerate(train_loader):
-        inputs = data['image'].cuda()
-        labels = data['label'].cuda()
-        optimizer.zero_grad()
+                outputs = net(inputs)
 
-        outputs = net(inputs)
+                loss = criterion(outputs, labels.flatten())
+                loss.backward()
+                optimizer.step()
 
-        loss = criterion(outputs, labels.flatten())
-        loss.backward()
-        optimizer.step()
-        loss_tmp += loss.cpu().data.numpy()
+                print("\r[Round %2d][Site %2d][Step %4d/%4d] Loss: %.4f, Lr: %.2e" % (
+                          round,
+                          i,
+                          iteration,
+                          int(len(site_loader.dataset) / args.batch_size),
+                          loss.cpu().data.numpy() / args.batch_size,
+                          args.lr,# *[group['lr'] for group in optim.param_groups],
+                      ), end='          ')
 
-        print("\r[Epoch %2d][Step %4d/%4d] Loss: %.4f, Lr: %.2e" % (
-                  1,
-                  iteration,
-                  int(len(train_loader.dataset) / args.batch_size),
-                  loss_tmp / args.batch_size,
-                  args.lr,# *[group['lr'] for group in optim.param_groups],
-              ), end='          ')
-
-    net.train(False)
-    accuracy = []
-
-    for iteration, data in enumerate(eval_loader):
-        inputs = data['image'].cuda()
-        labels = data['label']
-        pred = net(inputs).cpu().data.numpy()
-        labels = labels.cpu().data.numpy()
-        accuracy += list(np.argmax(pred, axis=1) == labels.flatten())
-    print(100 * np.mean(np.array(accuracy)))
-    net.train(True)
+        net.train(False)
+        accuracy = []
+        for iteration, data in enumerate(eval_loader):
+            inputs = data['image'].cuda()
+            labels = data['label']
+            pred = net(inputs).cpu().data.numpy()
+            labels = labels.cpu().data.numpy()
+            accuracy += list(np.argmax(pred, axis=1) == labels.flatten())
+        print('Evaluation accuracy', str(100 * np.mean(np.array(accuracy))))
 
 

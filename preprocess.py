@@ -11,11 +11,11 @@ def scaleRadius(img,scale):
     return cv2.resize(img,(0,0),fx=s,fy=s)
 
 scale = 256
-files = glob.glob("/media/jb/DATA/retina/train/*.jpeg")
+files = glob.glob("/media/jb/DATA/retina/test/*.jpeg")
 for i, f in enumerate(tqdm(files)):
     try:
-        outfile = "out_train/" + os.path.basename(f).split(".")[0]
-        if os.path.exists(outfile+".npy"):#and os.path.getsize(outfile+".npy") == 393344:
+        outfile = "out_test/" + os.path.basename(f).split(".")[0]
+        if os.path.exists(outfile+".npy") and os.path.getsize(outfile+".npy") == 196736:
             continue
         a = cv2.imread(f)
         a = scaleRadius(a, scale)
@@ -23,7 +23,9 @@ for i, f in enumerate(tqdm(files)):
         cv2.circle(b, (a.shape[1] // 2, a.shape[0] // 2), int(scale * 0.9), (1, 1, 1), -1, 8, 0)
         aa = cv2.addWeighted(a, 4, cv2.GaussianBlur(a, (0, 0), scale / 30), -4, 128) * b + 128 * (1 - b)
         aa = cv2.resize(aa, (256, 256))
-        # cv2.imwrite(str(scale) + "_" + f, aa)
+        # cv2.imwrite('savedImage.jpg', aa)
+        # cv2.imwrite('orig.jpg', a)
+        # sys.exit()
         np.save(outfile, np.array(aa).astype(np.uint8))
     except cv2.error:
         print("Unexpected error:", sys.exc_info()[0])
