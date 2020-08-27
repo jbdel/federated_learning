@@ -29,16 +29,17 @@ def get_transform(name):
 
 
 class Retina_Dataset(Dataset):
-    def __init__(self, name, args, num_site):
+    def __init__(self, name, args, num_site, distribution=None, index_label=None):
         super(Retina_Dataset, self).__init__()
         assert name in ['train', 'val']
         self.name = name
         self.args = args
         self.num_site = num_site
         self.transform = get_transform(name)
+        self.distribution = distribution
 
         # Loading and categorizing labels
-        reader = pd.read_csv(os.path.join(args.data_dir, name + "_liang.csv"))  # to shuffle ?
+        reader = pd.read_csv(os.path.join(args.data_dir, name + "_liang.csv"))
         reader.drop(reader.loc[reader['image'] == '492_right'].index, inplace=True)  # bad sample
         reader.drop(reader.loc[reader['image'] == '25313_right'].index, inplace=True)  # bad sample
         reader.drop(reader.loc[reader['image'] == '27096_right'].index, inplace=True)  # bad sample
@@ -51,20 +52,19 @@ class Retina_Dataset(Dataset):
             for i in range(reader['level'].nunique()):
                 labels.append(reader.loc[reader['level'] == i])
 
-        assert len(args.distribution) == len(labels), "labels distribution doesnt match " \
-                                                      "the number of different labels"
         self.labels = {}
         self.images = {}
 
-        # Feed the dictionary of the dataloader according to its site number and distribution
+        # Feed the dictionary of the dataloader according to its distribution and index_label
         for i, label in enumerate(labels):
             # eval or test
-            if num_site == 'val':
+            if name == 'train':
+                num_samples_for_label = int(self.args.samples_site * self.distribution[i])
+                # Where to start feeding dataloader in the label list:
+                start_feeding = int(index_label[i] * self.args.samples_site)
+            else:
                 num_samples_for_label = len(label)  # take all
                 start_feeding = 0
-            else:  # train
-                num_samples_for_label = int(self.args.samples_site * self.args.distribution[i])
-                start_feeding = self.num_site * num_samples_for_label
 
             for j, (image, c) in enumerate(zip(label['image'], label['level'])):
                 if j >= start_feeding:
@@ -76,7 +76,12 @@ class Retina_Dataset(Dataset):
                     if j == (start_feeding + num_samples_for_label - 1):
                         break
 
-        print("Label balance for site " + str(self.num_site), Counter(self.labels.values()))
+        if name == 'train':
+            print("Label balance for round " + str(self.num_site[0] + 1) + " site " + str(self.num_site[1] + 1),
+                  Counter(self.labels.values()))
+        else:
+            print("Label balance for " + name, Counter(self.labels.values()))
+
         self.set = list(self.labels.keys())
 
     def __getitem__(self, idx):
