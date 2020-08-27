@@ -23,6 +23,7 @@ def parse_args():
 
     # Training
     parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--epoch_per', type=int, default=1)
     parser.add_argument('--lr', type=float, default=0.0001)
     parser.add_argument('--task_binary', type=bool, default=True)
 
@@ -63,30 +64,32 @@ if __name__ == '__main__':
                        2 if args.task_binary else 5)
     net.cuda()
 
-    optimizer = optim.Adam(net.parameters(), lr=args.lr)
     criterion = nn.CrossEntropyLoss(reduction="sum").cuda()
     for round in range(args.rounds):
         net.train(True)
         for i, site_loader in enumerate(site_loaders):
-            for iteration, data in enumerate(site_loader):
-                inputs = data['image'].cuda()
-                labels = data['label'].cuda()
-                optimizer.zero_grad()
-
-                outputs = net(inputs)
-
-                loss = criterion(outputs, labels.flatten())
-                loss.backward()
-                optimizer.step()
-
-                print("\r[Round %2d][Site %2d][Step %4d/%4d] Loss: %.4f, Lr: %.2e" % (
-                          round,
-                          i,
-                          iteration,
-                          int(len(site_loader.dataset) / args.batch_size),
-                          loss.cpu().data.numpy() / args.batch_size,
-                          args.lr,# *[group['lr'] for group in optim.param_groups],
-                      ), end='          ')
+            optimizer = optim.Adam(net.parameters(), lr=args.lr)
+            for epoch in range(args.epoch_per):
+                for iteration, data in enumerate(site_loader):
+                    inputs = data['image'].cuda()
+                    labels = data['label'].cuda()
+                    optimizer.zero_grad()
+    
+                    outputs = net(inputs)
+    
+                    loss = criterion(outputs, labels.flatten())
+                    loss.backward()
+                    optimizer.step()
+    
+                    print("\r[Round %2d][Site %2d][Epoch %2d][Step %4d/%4d] Loss: %.4f, Lr: %.2e" % (
+                              round + 1,
+                              i + 1,
+                              epoch + 1,
+                              iteration,
+                              int(len(site_loader.dataset) / args.batch_size),
+                              loss.cpu().data.numpy() / args.batch_size,
+                              args.lr,# *[group['lr'] for group in optim.param_groups],
+                          ), end='          ')
 
         net.train(False)
         accuracy = []
