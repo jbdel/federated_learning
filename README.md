@@ -15,7 +15,7 @@
 
 Place all .npy files from retina dataset (links below) in the data/images folder.
 ```
-python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1000 --epoch_per 1 --distribution 0.5 0.5
+python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1500 --epoch_per 5 --distribution [[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5]]
 ```
 
 <b>Results of the script: (homogeneous)</b><br/>
@@ -23,37 +23,24 @@ python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1000 --epoch_
 3 rounds, 1000 samples/site, 1 epoch per site
 
 ```
-[Round  1][Site  4][Epoch  1][Step   93/  93] Loss: 0.4973, Lr: 1.00e-04          Evaluation accuracy 68.46666666666667
-[Round  2][Site  4][Epoch  1][Step   93/  93] Loss: 0.3272, Lr: 1.00e-04          Evaluation accuracy 76.43333333333334
-[Round  3][Site  4][Epoch  1][Step   93/  93] Loss: 0.1500, Lr: 1.00e-04          Evaluation accuracy 72.76666666666667
+[Round  1][Site  4][Epoch  1][Step   62/  62] Loss: 0.2695, Lr: 1.00e-04          Evaluation accuracy 70.86666666666666
+[Round  2][Site  4][Epoch  1][Step   62/  62] Loss: 0.3877, Lr: 1.00e-04          Evaluation accuracy 73.56666666666666
+[Round  3][Site  4][Epoch  1][Step   62/  62] Loss: 0.2413, Lr: 1.00e-04          Evaluation accuracy 76.6
 ```
 
-5 rounds, 1000 samples/site, 1 epoch per site
-```
-[Round  1][Site  4][Epoch  1][Step   62/  62] Loss: 0.2833, Lr: 1.00e-04          Evaluation accuracy 64.26666666666667
-[Round  2][Site  4][Epoch  1][Step   62/  62] Loss: 0.2774, Lr: 1.00e-04          Evaluation accuracy 75.0
-[Round  3][Site  4][Epoch  1][Step   62/  62] Loss: 0.2409, Lr: 1.00e-04          Evaluation accuracy 75.73333333333333
-[Round  4][Site  4][Epoch  1][Step   62/  62] Loss: 0.1499, Lr: 1.00e-04          Evaluation accuracy 72.46666666666667
-[Round  5][Site  4][Epoch  1][Step   62/  62] Loss: 0.1425, Lr: 1.00e-04          Evaluation accuracy 77.03333333333333
-```
-
-5 rounds, 1500 samples/site, 1 epoch per site
-```
-[Round  1][Site  4][Epoch  1][Step   93/  93] Loss: 0.3132, Lr: 1.00e-04          Evaluation accuracy 69.63333333333334
-[Round  2][Site  4][Epoch  1][Step   93/  93] Loss: 0.2224, Lr: 1.00e-04          Evaluation accuracy 73.83333333333333
-[Round  3][Site  4][Epoch  1][Step   93/  93] Loss: 0.2381, Lr: 1.00e-04          Evaluation accuracy 73.7
-[Round  4][Site  4][Epoch  1][Step   93/  93] Loss: 0.2268, Lr: 1.00e-04          Evaluation accuracy 78.16666666666666
-[Round  5][Site  4][Epoch  1][Step   93/  93] Loss: 0.1443, Lr: 1.00e-04          Evaluation accuracy 71.93333333333334
-```
 
 5 rounds, 1500 samples/site, 5 epoch per site
 ```
-[Round  1][Site  4][Epoch  5][Step   93/  93] Loss: 0.1605, Lr: 1.00e-04          Evaluation accuracy 68.83333333333333
-[Round  2][Site  4][Epoch  5][Step   93/  93] Loss: 0.0349, Lr: 1.00e-04          Evaluation accuracy 77.26666666666667
-[Round  3][Site  4][Epoch  5][Step   93/  93] Loss: 0.1368, Lr: 1.00e-04          Evaluation accuracy 77.13333333333333
-[Round  4][Site  4][Epoch  5][Step   93/  93] Loss: 0.0200, Lr: 1.00e-04          Evaluation accuracy 75.2
-[Round  5][Site  4][Epoch  5][Step   93/  93] Loss: 0.0934, Lr: 1.00e-04          Evaluation accuracy 76.6
+[Round  1][Site  4][Epoch  5][Step   93/  93] Loss: 0.3440, Lr: 1.00e-04          Evaluation accuracy 75.73333333333333
+[Round  2][Site  4][Epoch  5][Step   93/  93] Loss: 0.0717, Lr: 1.00e-04          Evaluation accuracy 76.36666666666667
+[Round  3][Site  4][Epoch  5][Step   93/  93] Loss: 0.0454, Lr: 1.00e-04          Evaluation accuracy 76.2
+[Round  4][Site  4][Epoch  5][Step   93/  93] Loss: 0.0678, Lr: 1.00e-04          Evaluation accuracy 72.39999999999999
+[Round  5][Site  4][Epoch  5][Step   93/  93] Loss: 0.0133, Lr: 1.00e-04          Evaluation accuracy 77.03333333333333
 ```
+
+python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1500 --epoch_per 5 --distribution [[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5]]
+
+
 
 [[Link to the handout]](https://github.com/jbdel/federated_learning/blob/master/Stanford_federated_handout.pdf) <br/><br/>
 ## Datasets
