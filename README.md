@@ -18,7 +18,7 @@ Place all .npy files from retina dataset (links below) in the data/images folder
 python main.py --batch_size 16 --rounds 5 --sites 4 --samples_site 1000 --epoch_per 1 --distribution 0.5 0.5
 ```
 
-<b>Results of the script: (homogeneous)<b/><br/>
+<b>Results of the script: (homogeneous)</b><br/>
   
 3 rounds, 1000 samples/site, 1 epoch per site
 
